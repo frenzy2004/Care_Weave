@@ -44,7 +44,7 @@ export default function VisitsLog() {
       {showForm && (
         <Card className="animate-fade-in-up gradient-border">
           <CardContent className="p-5 space-y-4">
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Date</Label>
                 <Input type="date" value={date} onChange={e => setDate(e.target.value)} />

@@ -50,7 +50,7 @@ export default function HealthTimeline() {
           {doctorMode ? 'Clinical Timeline' : 'Health Timeline'}
         </h1>
         <Select value={filter} onValueChange={setFilter}>
-          <SelectTrigger className="w-40">
+          <SelectTrigger className="w-36 sm:w-40">
             <SelectValue placeholder="Filter" />
           </SelectTrigger>
           <SelectContent>
@@ -66,7 +66,7 @@ export default function HealthTimeline() {
 
       <div className="relative">
         {/* Gradient timeline line */}
-        <div className="absolute left-5 top-0 bottom-0 w-px bg-gradient-to-b from-primary via-primary/40 to-border" />
+        <div className="absolute left-[18px] sm:left-5 top-0 bottom-0 w-px bg-gradient-to-b from-primary via-primary/40 to-border" />
 
         <div className="space-y-4">
           {timeline.map((event, i) => {
@@ -75,10 +75,10 @@ export default function HealthTimeline() {
             return (
               <div
                 key={event.id}
-                className="relative flex gap-4 pl-2 animate-fade-in-up"
+                className="relative flex gap-2 sm:gap-4 pl-2 animate-fade-in-up"
                 style={{ animationDelay: `${i * 50}ms` }}
               >
-                <div className={`z-10 flex items-center justify-center w-10 h-10 rounded-full border-2 ${typeGradients[event.type]} transition-transform hover:scale-110`}>
+                <div className={`z-10 flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-full border-2 shrink-0 ${typeGradients[event.type]} transition-transform hover:scale-110`}>
                   <Icon className="h-4 w-4" />
                 </div>
                 <Card className={`flex-1 hover-lift ${typeBorderAccent[event.type]}`}>

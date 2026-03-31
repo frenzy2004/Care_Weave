@@ -37,7 +37,7 @@ export default function ProviderDirectory() {
       {showForm && (
         <Card className="animate-fade-in-up gradient-border">
           <CardContent className="p-5 space-y-4">
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div className="space-y-2">
                 <Label>Name</Label>
                 <Input value={name} onChange={e => setName(e.target.value)} placeholder="Dr. Smith" />

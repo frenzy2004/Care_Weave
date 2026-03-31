@@ -67,8 +67,8 @@ export default function Dashboard() {
           'bg-gradient-to-br from-muted to-transparent'
         }`}>
           <div className="absolute inset-0 dot-pattern opacity-30" />
-          <CardContent className="p-6 flex items-center gap-5 relative">
-            <div className={`flex items-center justify-center w-14 h-14 rounded-2xl ${
+          <CardContent className="p-4 sm:p-6 flex items-center gap-3 sm:gap-5 relative">
+            <div className={`flex items-center justify-center w-10 h-10 sm:w-14 sm:h-14 rounded-2xl shrink-0 ${
               changePct > 0 ? 'bg-chart-teal/15' : changePct < 0 ? 'bg-chart-red/15' : 'bg-muted'
             }`}>
               {changePct > 0 ? (
@@ -80,7 +80,7 @@ export default function Dashboard() {
               )}
             </div>
             <div>
-              <p className="text-2xl font-bold text-foreground">
+              <p className="text-lg sm:text-2xl font-bold text-foreground">
                 {changePct > 0 ? `Symptoms improved ${changePct}%` :
                  changePct < 0 ? `Symptoms increased ${Math.abs(changePct)}%` : 'Symptoms are stable'}
               </p>
@@ -93,7 +93,7 @@ export default function Dashboard() {
       </div>
 
       {/* Quick Actions */}
-      <div className="flex flex-wrap gap-3 animate-fade-in-up stagger-2">
+      <div className="flex flex-wrap gap-3 animate-fade-in-up stagger-2 [&>*]:flex-1 [&>*]:sm:flex-none">
         <Button onClick={() => navigate('/log-symptom')} className="gap-2 gradient-primary border-0 text-white shadow-md hover:shadow-lg transition-shadow">
           <PlusCircle className="h-4 w-4" /> Log Symptom
         </Button>
@@ -104,7 +104,7 @@ export default function Dashboard() {
           <Calendar className="h-4 w-4" /> Record Visit
         </Button>
         <Button
-          className="gap-2 bg-destructive text-destructive-foreground border-0 animate-pulse-glow"
+          className="gap-2 bg-destructive text-destructive-foreground border-0 animate-pulse-glow w-full sm:w-auto"
           onClick={() => navigate('/log-symptom?flare=true')}
         >
           <Flame className="h-4 w-4" /> {doctorMode ? 'Log Flare Event' : '🔥 Flare Day'}
@@ -112,7 +112,7 @@ export default function Dashboard() {
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 animate-fade-in-up stagger-3">
+      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 animate-fade-in-up stagger-3">
         {stats.map((stat, i) => (
           <Card key={i} className="hover-lift relative overflow-hidden group">
             <div className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${statAccents[i].gradient}`} />

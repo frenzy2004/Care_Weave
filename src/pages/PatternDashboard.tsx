@@ -159,7 +159,7 @@ export default function PatternDashboard() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="h-64">
+          <div className="h-48 sm:h-64">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={severityData}>
                 <defs>
@@ -234,7 +234,7 @@ export default function PatternDashboard() {
             <CardTitle className="text-sm">Treatment Categories</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="h-48">
+            <div className="h-40 sm:h-48">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie

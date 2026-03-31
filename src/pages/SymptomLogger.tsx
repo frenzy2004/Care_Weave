@@ -130,7 +130,7 @@ export default function SymptomLogger() {
                   value={selectedSymptoms.get(type)}
                   onValueChange={(v) => setSeverity(type, v as Severity)}
                 >
-                  <SelectTrigger className="w-28 h-8">
+                  <SelectTrigger className="w-24 sm:w-28 h-9">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -146,7 +146,7 @@ export default function SymptomLogger() {
       </Card>
 
       {/* Date & Provider */}
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="space-y-2">
           <Label>Date</Label>
           <Input type="date" value={date} onChange={e => setDate(e.target.value)} />

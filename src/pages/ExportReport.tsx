@@ -58,16 +58,16 @@ export default function ExportReport() {
 
   return (
     <div className="max-w-4xl space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
         <h1 className="text-2xl font-bold text-foreground">
           {doctorMode ? 'Generate Clinical Report' : 'Export Report'}
         </h1>
-        <div className="flex gap-2">
-          <Button onClick={handleExport} disabled={loading} className="gap-2 gradient-primary border-0 text-white shadow-md hover:shadow-lg transition-shadow">
+        <div className="flex gap-2 w-full sm:w-auto">
+          <Button onClick={handleExport} disabled={loading} className="gap-2 gradient-primary border-0 text-white shadow-md hover:shadow-lg transition-shadow flex-1 sm:flex-none">
             {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <FileDown className="h-4 w-4" />}
             Download PDF
           </Button>
-          <Button onClick={() => window.print()} variant="outline" className="gap-2 hover-lift">
+          <Button onClick={() => window.print()} variant="outline" className="gap-2 hover-lift flex-1 sm:flex-none">
             <Printer className="h-4 w-4" /> Print
           </Button>
         </div>
@@ -75,7 +75,7 @@ export default function ExportReport() {
 
       {/* Report Preview */}
       <Card className="hover-lift shadow-xl shadow-foreground/5 transition-shadow hover:shadow-2xl">
-        <div ref={reportRef} className="bg-white text-gray-900 p-8 space-y-6">
+        <div ref={reportRef} className="bg-white text-gray-900 p-4 sm:p-8 space-y-6">
           {/* Header */}
           <div className="border-b-2 border-blue-600 pb-4">
             <div className="flex items-center gap-3">
@@ -94,7 +94,7 @@ export default function ExportReport() {
           {/* Patient Info */}
           <div className="bg-blue-50 rounded-lg p-4">
             <h3 className="font-bold text-gray-800 mb-2">Patient Information</h3>
-            <div className="grid grid-cols-2 text-sm gap-1">
+            <div className="grid grid-cols-1 sm:grid-cols-2 text-sm gap-1">
               <p><span className="text-gray-500">Name:</span> {patient.name}</p>
               <p><span className="text-gray-500">Conditions:</span> {patient.conditions.join(', ')}</p>
             </div>
@@ -127,7 +127,8 @@ export default function ExportReport() {
           {/* Active Medications */}
           <div>
             <h3 className="font-bold text-gray-800 mb-2">Active Medications</h3>
-            <table className="w-full text-sm">
+            <div className="overflow-x-auto -mx-1">
+            <table className="w-full text-sm min-w-[400px]">
               <thead>
                 <tr className="border-b border-gray-200">
                   <th className="text-left py-1 text-gray-600">Medication</th>
@@ -147,6 +148,7 @@ export default function ExportReport() {
                 ))}
               </tbody>
             </table>
+            </div>
           </div>
 
           {/* Recent Visits */}
