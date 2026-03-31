@@ -8,10 +8,20 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
 import { DrugClass, DRUG_CLASS_LABELS } from '@/types/health';
-import { Pill, Plus } from 'lucide-react';
+import { Pill, Plus, CheckCircle, XCircle } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 
 const drugClasses: DrugClass[] = ['anti-inflammatory', 'immunosuppressant', 'biologic', 'antispasmodic', 'probiotic', 'supplement', 'other'];
+
+const classGradients: Record<string, string> = {
+  'anti-inflammatory': 'from-chart-amber to-chart-red',
+  immunosuppressant: 'from-chart-purple to-chart-red',
+  biologic: 'from-chart-blue to-chart-teal',
+  antispasmodic: 'from-chart-teal to-chart-blue',
+  probiotic: 'from-chart-teal to-chart-amber',
+  supplement: 'from-muted-foreground/60 to-muted-foreground/40',
+  other: 'from-muted-foreground/60 to-muted-foreground/40',
+};
 
 export default function MedicationTracker() {
   const { medications, addMedication, updateMedication, providers, doctorMode } = useHealth();
@@ -39,61 +49,20 @@ export default function MedicationTracker() {
     toast.success('Medication stopped');
   };
 
-  const classColor = (dc: DrugClass) => {
-    const map: Record<string, string> = {
-      'anti-inflammatory': 'bg-chart-amber/15 text-chart-amber',
-      immunosuppressant: 'bg-chart-purple/15 text-chart-purple',
-      biologic: 'bg-chart-blue/15 text-chart-blue',
-      antispasmodic: 'bg-chart-teal/15 text-chart-teal',
-      probiotic: 'bg-chart-teal/15 text-chart-teal',
-      supplement: 'bg-muted text-muted-foreground',
-      other: 'bg-muted text-muted-foreground',
-    };
-    return map[dc] || map.other;
-  };
-
-  const MedCard = ({ med, isActive }: { med: typeof medications[0]; isActive: boolean }) => (
-    <Card key={med.id} className={!isActive ? 'opacity-60' : ''}>
-      <CardContent className="p-4 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <Pill className="h-5 w-5 text-primary" />
-          <div>
-            <p className="font-medium text-foreground">{med.name}</p>
-            <p className="text-sm text-muted-foreground">{med.dosage} • {med.frequency}</p>
-            <div className="flex items-center gap-2 mt-1">
-              <Badge className={classColor(med.drugClass)} variant="outline">
-                {DRUG_CLASS_LABELS[med.drugClass]}
-              </Badge>
-              <span className="text-xs text-muted-foreground">
-                {format(parseISO(med.startDate), 'MMM d, yyyy')}
-                {med.endDate && ` — ${format(parseISO(med.endDate), 'MMM d, yyyy')}`}
-              </span>
-            </div>
-          </div>
-        </div>
-        {isActive && (
-          <Button variant="outline" size="sm" onClick={() => stopMed(med.id)}>
-            Stop
-          </Button>
-        )}
-      </CardContent>
-    </Card>
-  );
-
   return (
     <div className="max-w-3xl space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-foreground">
           {doctorMode ? 'Medication Registry' : 'Medications'}
         </h1>
-        <Button onClick={() => setShowForm(!showForm)} className="gap-2">
+        <Button onClick={() => setShowForm(!showForm)} className="gap-2 gradient-primary border-0 text-white shadow-md">
           <Plus className="h-4 w-4" /> Add
         </Button>
       </div>
 
       {showForm && (
-        <Card>
-          <CardContent className="p-4 space-y-4">
+        <Card className="animate-fade-in-up gradient-border">
+          <CardContent className="p-5 space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Drug Name</Label>
@@ -134,23 +103,72 @@ export default function MedicationTracker() {
                 </Select>
               </div>
             </div>
-            <Button onClick={handleAdd}>Save Medication</Button>
+            <Button onClick={handleAdd} className="gradient-primary border-0 text-white">Save Medication</Button>
           </CardContent>
         </Card>
       )}
 
-      <div>
-        <h2 className="text-lg font-semibold mb-3 text-foreground">Active ({active.length})</h2>
+      {/* Active */}
+      {active.length > 0 && (
         <div className="space-y-3">
-          {active.map(m => <MedCard key={m.id} med={m} isActive />)}
-        </div>
-      </div>
-
-      {past.length > 0 && (
-        <div>
-          <h2 className="text-lg font-semibold mb-3 text-muted-foreground">Past ({past.length})</h2>
+          <h2 className="text-sm font-semibold text-muted-foreground flex items-center gap-2">
+            <CheckCircle className="h-4 w-4 text-chart-teal" /> Active ({active.length})
+          </h2>
           <div className="space-y-3">
-            {past.map(m => <MedCard key={m.id} med={m} isActive={false} />)}
+            {active.map((med, i) => (
+              <Card key={med.id} className="hover-lift border-l-[3px] border-l-chart-teal animate-fade-in-up" style={{ animationDelay: `${i * 60}ms` }}>
+                <CardContent className="p-4 flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center">
+                      <Pill className="h-4 w-4 text-primary" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-foreground">{med.name}</p>
+                      <p className="text-xs text-muted-foreground">{med.dosage} • {med.frequency}</p>
+                      <div className="flex items-center gap-2 mt-1.5">
+                        <Badge className={`bg-gradient-to-r ${classGradients[med.drugClass]} text-white border-0 text-[10px]`}>
+                          {DRUG_CLASS_LABELS[med.drugClass]}
+                        </Badge>
+                        <span className="text-[11px] text-muted-foreground">
+                          Since {format(parseISO(med.startDate), 'MMM d, yyyy')}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  <Button variant="outline" size="sm" onClick={() => stopMed(med.id)} className="hover:border-chart-red hover:text-chart-red transition-colors">
+                    Stop
+                  </Button>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Past */}
+      {past.length > 0 && (
+        <div className="space-y-3">
+          <h2 className="text-sm font-semibold text-muted-foreground flex items-center gap-2">
+            <XCircle className="h-4 w-4" /> Past ({past.length})
+          </h2>
+          <div className="space-y-3">
+            {past.map(med => (
+              <Card key={med.id} className="hover-lift border-dashed opacity-60 hover:opacity-100 transition-opacity">
+                <CardContent className="p-4 flex items-center gap-3">
+                  <Pill className="h-4 w-4 text-muted-foreground" />
+                  <div>
+                    <p className="font-medium text-foreground">{med.name}</p>
+                    <p className="text-xs text-muted-foreground">{med.dosage} • {med.frequency}</p>
+                    <div className="flex items-center gap-2 mt-1">
+                      <Badge variant="outline" className="text-[10px]">{DRUG_CLASS_LABELS[med.drugClass]}</Badge>
+                      <span className="text-[11px] text-muted-foreground">
+                        {format(parseISO(med.startDate), 'MMM d')} — {format(parseISO(med.endDate!), 'MMM d, yyyy')}
+                      </span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
           </div>
         </div>
       )}

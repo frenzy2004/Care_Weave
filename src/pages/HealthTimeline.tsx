@@ -9,21 +9,26 @@ import { format, parseISO } from 'date-fns';
 import { Activity, Pill, Calendar, Flame, FileText, StopCircle } from 'lucide-react';
 
 const typeIcons: Record<EventType, React.ElementType> = {
-  symptom: Activity,
-  flare: Flame,
-  medication_start: Pill,
-  medication_stop: StopCircle,
-  visit: Calendar,
-  note: FileText,
+  symptom: Activity, flare: Flame, medication_start: Pill,
+  medication_stop: StopCircle, visit: Calendar, note: FileText,
 };
 
-const typeColors: Record<EventType, string> = {
-  symptom: 'bg-chart-amber/15 text-chart-amber border-chart-amber/30',
-  flare: 'bg-chart-red/15 text-chart-red border-chart-red/30',
-  medication_start: 'bg-chart-blue/15 text-chart-blue border-chart-blue/30',
+const typeGradients: Record<EventType, string> = {
+  symptom: 'bg-gradient-to-br from-chart-amber/20 to-chart-amber/5 text-chart-amber border-chart-amber/30',
+  flare: 'bg-gradient-to-br from-chart-red/20 to-chart-red/5 text-chart-red border-chart-red/30',
+  medication_start: 'bg-gradient-to-br from-primary/20 to-primary/5 text-primary border-primary/30',
   medication_stop: 'bg-muted text-muted-foreground border-border',
-  visit: 'bg-chart-teal/15 text-chart-teal border-chart-teal/30',
+  visit: 'bg-gradient-to-br from-chart-teal/20 to-chart-teal/5 text-chart-teal border-chart-teal/30',
   note: 'bg-muted text-muted-foreground border-border',
+};
+
+const typeBorderAccent: Record<EventType, string> = {
+  symptom: 'border-accent-amber',
+  flare: 'border-accent-red',
+  medication_start: 'border-accent-blue',
+  medication_stop: '',
+  visit: 'border-accent-teal',
+  note: '',
 };
 
 export default function HealthTimeline() {
@@ -60,21 +65,27 @@ export default function HealthTimeline() {
       </div>
 
       <div className="relative">
-        <div className="absolute left-5 top-0 bottom-0 w-px bg-border" />
+        {/* Gradient timeline line */}
+        <div className="absolute left-5 top-0 bottom-0 w-px bg-gradient-to-b from-primary via-primary/40 to-border" />
+
         <div className="space-y-4">
-          {timeline.map(event => {
+          {timeline.map((event, i) => {
             const Icon = typeIcons[event.type];
             const providerName = getProviderName(event.providerId);
             return (
-              <div key={event.id} className="relative flex gap-4 pl-2">
-                <div className={`z-10 flex items-center justify-center w-8 h-8 rounded-full border ${typeColors[event.type]}`}>
+              <div
+                key={event.id}
+                className="relative flex gap-4 pl-2 animate-fade-in-up"
+                style={{ animationDelay: `${i * 50}ms` }}
+              >
+                <div className={`z-10 flex items-center justify-center w-10 h-10 rounded-full border-2 ${typeGradients[event.type]} transition-transform hover:scale-110`}>
                   <Icon className="h-4 w-4" />
                 </div>
-                <Card className="flex-1">
+                <Card className={`flex-1 hover-lift ${typeBorderAccent[event.type]}`}>
                   <CardContent className="p-4">
                     <div className="flex items-center gap-2 flex-wrap">
                       <span className="font-medium text-foreground">{event.title}</span>
-                      <Badge variant="outline" className="text-[10px]">
+                      <Badge variant="outline" className="text-[10px] bg-muted/50">
                         {format(parseISO(event.date), 'MMM d, yyyy')}
                       </Badge>
                       {providerName && (

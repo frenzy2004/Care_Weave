@@ -69,59 +69,61 @@ export default function SymptomLogger() {
       </h1>
 
       {/* Flare Toggle */}
-      <Card className={isFlare ? 'border-chart-red bg-destructive/5' : ''}>
+      <Card className={`transition-all duration-300 ${isFlare ? 'border-chart-red/50 bg-gradient-to-r from-chart-red/10 to-transparent animate-pulse-glow' : 'hover-lift'}`}>
         <CardContent className="p-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Flame className={`h-5 w-5 ${isFlare ? 'text-chart-red' : 'text-muted-foreground'}`} />
+          <div className="flex items-center gap-3">
+            <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${isFlare ? 'bg-chart-red/15' : 'bg-muted'}`}>
+              <Flame className={`h-4 w-4 transition-colors ${isFlare ? 'text-chart-red' : 'text-muted-foreground'}`} />
+            </div>
             <span className="font-medium">{doctorMode ? 'Flare Event' : '🔥 Flare Day'}</span>
           </div>
           <Switch checked={isFlare} onCheckedChange={setIsFlare} />
         </CardContent>
       </Card>
 
-      {/* Pain Level */}
-      <Card>
+      {/* Pain Level — Circular buttons */}
+      <Card className="hover-lift">
         <CardHeader className="pb-2">
           <CardTitle className="text-sm">
             {doctorMode ? 'Pain Severity (1-10)' : 'How are you feeling?'}
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-2 justify-center flex-wrap">
             {scale.map((label, i) => (
               <button
                 key={i}
                 onClick={() => setPainLevel(i + 1)}
-                className={`flex-1 py-2 rounded text-center text-sm transition-all ${
+                className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium transition-all duration-200 ${
                   painLevel === i + 1
-                    ? 'bg-primary text-primary-foreground scale-110'
-                    : 'bg-muted hover:bg-accent'
+                    ? 'gradient-primary text-white shadow-lg scale-110 glow-primary'
+                    : 'bg-muted hover:bg-accent hover:scale-105 text-muted-foreground'
                 }`}
               >
-                {doctorMode ? label : <span className="text-lg">{label}</span>}
+                {doctorMode ? label : <span className="text-base">{label}</span>}
               </button>
             ))}
           </div>
-          <p className="text-center text-sm text-muted-foreground mt-2">
+          <p className="text-center text-sm text-muted-foreground mt-3">
             {doctorMode ? `Severity: ${painLevel}/10` : `Pain level: ${painLevel}/10`}
           </p>
         </CardContent>
       </Card>
 
       {/* Symptoms */}
-      <Card>
+      <Card className="hover-lift">
         <CardHeader className="pb-2">
           <CardTitle className="text-sm">Symptoms</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-3">
+        <CardContent className="space-y-2">
           {symptomOptions.map(type => (
-            <div key={type} className="flex items-center justify-between">
+            <div key={type} className={`flex items-center justify-between p-2 rounded-lg transition-colors ${selectedSymptoms.has(type) ? 'bg-accent/50' : 'hover:bg-muted/50'}`}>
               <div className="flex items-center gap-2">
                 <Checkbox
                   checked={selectedSymptoms.has(type)}
                   onCheckedChange={() => toggleSymptom(type)}
                 />
-                <Label>{SYMPTOM_LABELS[type]}</Label>
+                <Label className="cursor-pointer">{SYMPTOM_LABELS[type]}</Label>
               </div>
               {selectedSymptoms.has(type) && (
                 <Select
@@ -173,7 +175,7 @@ export default function SymptomLogger() {
         />
       </div>
 
-      <Button onClick={handleSubmit} className="w-full" size="lg">
+      <Button onClick={handleSubmit} className="w-full gradient-primary border-0 text-white shadow-lg hover:shadow-xl transition-shadow" size="lg">
         {doctorMode ? 'Record Entry' : 'Save Symptoms'}
       </Button>
     </div>
