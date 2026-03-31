@@ -41,7 +41,7 @@ export default function MedicationTracker() {
     addMedication({ name, dosage, frequency, drugClass, startDate, providerId: providerId || undefined });
     toast.success('Medication added');
     setShowForm(false);
-    setName(''); setDosage(''); setFrequency(''); setDrugClass('other');
+    setName(''); setDosage(''); setFrequency(''); setDrugClass('other'); setStartDate(new Date().toISOString().split('T')[0]); setProviderId('');
   };
 
   const stopMed = (id: string) => {
@@ -116,7 +116,7 @@ export default function MedicationTracker() {
           </h2>
           <div className="space-y-3">
             {active.map((med, i) => (
-              <Card key={med.id} className="hover-lift border-l-[3px] border-l-chart-teal animate-fade-in-up" style={{ animationDelay: `${i * 60}ms` }}>
+              <Card key={med.id} className="hover-lift border-accent-teal animate-fade-in-up" style={{ animationDelay: `${i * 60}ms` }}>
                 <CardContent className="p-4 flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center">

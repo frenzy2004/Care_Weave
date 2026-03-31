@@ -74,7 +74,7 @@ export function generateHealthStory(
     paragraphs.push(
       doctorMode
         ? `Following initiation of ${medNames || 'current treatment regimen'}, average pain severity decreased by approximately ${improvementPct}%. Current regimen includes ${activeMeds.length} active medication${activeMeds.length !== 1 ? 's' : ''}.`
-        : `After starting ${medNames || 'your current medications'}, ${prefix.toLowerCase()}r pain has reduced by about ${improvementPct}%. ${prefix} ${prefix === 'You' ? 'are' : 'is'} currently on ${activeMeds.length} active medication${activeMeds.length !== 1 ? 's' : ''}.`
+        : `After starting ${medNames || 'your current medications'}, ${possessive.toLowerCase()} pain has reduced by about ${improvementPct}%. ${prefix} ${prefix === 'You' ? 'are' : 'is'} currently on ${activeMeds.length} active medication${activeMeds.length !== 1 ? 's' : ''}.`
     );
   } else if (improvementPct < 0) {
     paragraphs.push(

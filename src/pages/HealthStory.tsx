@@ -5,8 +5,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { BookOpen, Info, Quote } from 'lucide-react';
 
 const borderColors = [
-  'border-l-primary', 'border-l-chart-teal', 'border-l-chart-purple',
-  'border-l-chart-amber', 'border-l-chart-blue',
+  'border-accent-blue', 'border-accent-teal', 'border-accent-red',
+  'border-accent-amber', 'border-accent-blue',
 ];
 
 export default function HealthStory() {

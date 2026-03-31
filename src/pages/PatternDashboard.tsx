@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { DRUG_CLASS_LABELS } from '@/types/health';
 import { Brain, TrendingDown, TrendingUp, AlertTriangle, Activity } from 'lucide-react';
-import { format, parseISO } from 'date-fns';
+import { format, parseISO, subMonths, addDays } from 'date-fns';
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell,
@@ -82,6 +82,19 @@ export default function PatternDashboard() {
     month: format(parseISO(m.startDate), 'MMM yy'),
     name: m.name,
   }));
+
+  const medTimelineRange = useMemo(() => {
+    if (medications.length === 0) {
+      const start = subMonths(new Date(), 6);
+      return { refStart: start, totalDays: 180, startLabel: format(start, 'MMM yyyy'), endLabel: format(new Date(), 'MMM yyyy') };
+    }
+    const starts = medications.map(m => parseISO(m.startDate));
+    const earliest = new Date(Math.min(...starts.map(d => d.getTime())));
+    const refStart = earliest;
+    const totalDays = 180;
+    const refEnd = addDays(refStart, totalDays);
+    return { refStart, totalDays, startLabel: format(refStart, 'MMM yyyy'), endLabel: format(refEnd, 'MMM yyyy') };
+  }, [medications]);
 
   return (
     <div className="max-w-5xl space-y-6">
@@ -188,8 +201,7 @@ export default function PatternDashboard() {
               {medTimeline.map((m, i) => {
                 const start = parseISO(m.start);
                 const end = parseISO(m.end);
-                const totalDays = 180;
-                const refStart = parseISO('2025-10-01');
+                const { refStart, totalDays } = medTimelineRange;
                 const leftPct = Math.max(0, ((start.getTime() - refStart.getTime()) / (totalDays * 86400000)) * 100);
                 const widthPct = Math.max(5, ((end.getTime() - start.getTime()) / (totalDays * 86400000)) * 100);
                 return (
@@ -210,7 +222,7 @@ export default function PatternDashboard() {
                 );
               })}
               <div className="flex justify-between text-[10px] text-muted-foreground mt-2">
-                <span>Oct 2025</span><span>Mar 2026</span>
+                <span>{medTimelineRange.startLabel}</span><span>{medTimelineRange.endLabel}</span>
               </div>
             </div>
           </CardContent>

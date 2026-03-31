@@ -24,7 +24,7 @@ export default function VisitsLog() {
     addVisit({ date, providerId, purpose, notes, linkedMedIds: [], linkedSymptomIds: [] });
     toast.success('Visit recorded');
     setShowForm(false);
-    setPurpose(''); setNotes('');
+    setPurpose(''); setNotes(''); setDate(new Date().toISOString().split('T')[0]); setProviderId('');
   };
 
   const getProviderName = (id: string) => providers.find(p => p.id === id)?.name || 'Unknown';

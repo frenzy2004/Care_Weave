@@ -48,7 +48,7 @@ export function buildTimeline(
       date: v.date,
       type: 'visit',
       title: 'Visit Outcome',
-      description: `${v.purpose}. ${v.notes}`,
+      description: v.notes ? `${v.purpose}. ${v.notes}` : v.purpose,
       providerId: v.providerId,
       sourceId: v.id,
     });
