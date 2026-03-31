@@ -8,7 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
-import { Calendar, Plus } from 'lucide-react';
+import { Calendar, Plus, FileText } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 
 export default function VisitsLog() {
@@ -28,7 +28,6 @@ export default function VisitsLog() {
   };
 
   const getProviderName = (id: string) => providers.find(p => p.id === id)?.name || 'Unknown';
-
   const sorted = [...visits].sort((a, b) => b.date.localeCompare(a.date));
 
   return (
@@ -37,14 +36,14 @@ export default function VisitsLog() {
         <h1 className="text-2xl font-bold text-foreground">
           {doctorMode ? 'Clinical Visits' : 'Visits'}
         </h1>
-        <Button onClick={() => setShowForm(!showForm)} className="gap-2">
+        <Button onClick={() => setShowForm(!showForm)} className="gap-2 gradient-primary border-0 text-white shadow-md">
           <Plus className="h-4 w-4" /> Record Visit
         </Button>
       </div>
 
       {showForm && (
-        <Card>
-          <CardContent className="p-4 space-y-4">
+        <Card className="animate-fade-in-up gradient-border">
+          <CardContent className="p-5 space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Date</Label>
@@ -70,27 +69,29 @@ export default function VisitsLog() {
               <Label>Notes</Label>
               <Textarea value={notes} onChange={e => setNotes(e.target.value)} placeholder="Visit outcomes..." rows={3} />
             </div>
-            <Button onClick={handleAdd}>Save Visit</Button>
+            <Button onClick={handleAdd} className="gradient-primary border-0 text-white">Save Visit</Button>
           </CardContent>
         </Card>
       )}
 
-      <div className="space-y-3">
-        {sorted.map(v => (
-          <Card key={v.id}>
-            <CardContent className="p-4">
-              <div className="flex items-start justify-between">
-                <div className="flex items-start gap-3">
-                  <Calendar className="h-5 w-5 text-primary mt-0.5" />
-                  <div>
-                    <p className="font-medium text-foreground">{v.purpose}</p>
-                    <p className="text-sm text-muted-foreground mt-1">{v.notes}</p>
-                    <div className="flex items-center gap-2 mt-2">
-                      <Badge variant="outline">{getProviderName(v.providerId)}</Badge>
-                    </div>
-                  </div>
+      <div className="space-y-4">
+        {sorted.map((v, i) => (
+          <Card key={v.id} className="hover-lift animate-fade-in-up" style={{ animationDelay: `${i * 60}ms` }}>
+            <CardContent className="p-5">
+              <div className="flex items-start gap-4">
+                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+                  <Calendar className="h-5 w-5 text-primary" />
                 </div>
-                <Badge variant="secondary">{format(parseISO(v.date), 'MMM d, yyyy')}</Badge>
+                <div className="flex-1">
+                  <div className="flex items-center justify-between flex-wrap gap-2">
+                    <div className="flex items-center gap-2">
+                      <span className="font-semibold text-foreground">{v.purpose}</span>
+                      <Badge variant="outline" className="text-[10px] bg-muted/50">{getProviderName(v.providerId)}</Badge>
+                    </div>
+                    <Badge variant="secondary" className="text-[10px]">{format(parseISO(v.date), 'MMM d, yyyy')}</Badge>
+                  </div>
+                  {v.notes && <p className="text-sm text-muted-foreground mt-2 leading-relaxed">{v.notes}</p>}
+                </div>
               </div>
             </CardContent>
           </Card>

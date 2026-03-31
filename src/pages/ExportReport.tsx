@@ -2,11 +2,10 @@ import { useRef, useState } from 'react';
 import { useHealth } from '@/contexts/HealthDataContext';
 import { generateInsights } from '@/utils/insightEngine';
 import { generateHealthStory, HEALTH_STORY_DISCLAIMER } from '@/utils/healthStoryGenerator';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { DRUG_CLASS_LABELS } from '@/types/health';
-import { FileDown, Loader2 } from 'lucide-react';
+import { FileDown, Loader2, Printer, FileText } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
@@ -34,30 +33,22 @@ export default function ExportReport() {
     if (!reportRef.current) return;
     setLoading(true);
     try {
-      const canvas = await html2canvas(reportRef.current, {
-        scale: 2,
-        backgroundColor: '#ffffff',
-        useCORS: true,
-      });
+      const canvas = await html2canvas(reportRef.current, { scale: 2, backgroundColor: '#ffffff', useCORS: true });
       const imgData = canvas.toDataURL('image/png');
       const pdf = new jsPDF('p', 'mm', 'a4');
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-
       let heightLeft = pdfHeight;
       let position = 0;
       const pageHeight = pdf.internal.pageSize.getHeight();
-
       pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, pdfHeight);
       heightLeft -= pageHeight;
-
       while (heightLeft > 0) {
         position = heightLeft - pdfHeight;
         pdf.addPage();
         pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, pdfHeight);
         heightLeft -= pageHeight;
       }
-
       pdf.save(`CareWeave_Report_${patient.name.replace(/\s/g, '_')}_${format(new Date(), 'yyyy-MM-dd')}.pdf`);
     } catch (err) {
       console.error('PDF export failed:', err);
@@ -71,98 +62,111 @@ export default function ExportReport() {
         <h1 className="text-2xl font-bold text-foreground">
           {doctorMode ? 'Generate Clinical Report' : 'Export Report'}
         </h1>
-        <Button onClick={handleExport} disabled={loading} className="gap-2">
-          {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <FileDown className="h-4 w-4" />}
-          Download PDF
-        </Button>
+        <div className="flex gap-2">
+          <Button onClick={handleExport} disabled={loading} className="gap-2 gradient-primary border-0 text-white shadow-md hover:shadow-lg transition-shadow">
+            {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <FileDown className="h-4 w-4" />}
+            Download PDF
+          </Button>
+          <Button onClick={() => window.print()} variant="outline" className="gap-2 hover-lift">
+            <Printer className="h-4 w-4" /> Print
+          </Button>
+        </div>
       </div>
 
-      <div ref={reportRef} className="bg-white p-8 space-y-6 text-gray-900 rounded-lg">
-        {/* Header */}
-        <div className="border-b-2 border-blue-600 pb-4">
-          <h1 className="text-2xl font-bold text-blue-600">CareWeave Health Report</h1>
-          <p className="text-sm text-gray-500 mt-1">
-            Generated {format(new Date(), 'MMMM d, yyyy')} • {doctorMode ? 'Clinical Format' : 'Patient Format'}
-          </p>
-        </div>
-
-        {/* Patient Info */}
-        <div>
-          <h2 className="text-lg font-semibold text-gray-900">Patient Information</h2>
-          <p className="text-sm text-gray-700">Name: {patient.name}</p>
-          <p className="text-sm text-gray-700">Conditions: {patient.conditions.join(', ')}</p>
-          <p className="text-sm font-medium text-blue-600 mt-2">
-            {changePct > 0 ? `Symptoms improved ${changePct}%` : changePct < 0 ? `Symptoms increased ${Math.abs(changePct)}%` : 'Symptoms stable'} over tracking period
-          </p>
-        </div>
-
-        {/* Health Story */}
-        <div>
-          <h2 className="text-lg font-semibold text-gray-900">
-            {doctorMode ? 'Clinical Summary' : 'Health Journey'}
-          </h2>
-          {story.map((p, i) => (
-            <p key={i} className="text-sm text-gray-700 mt-2">{p}</p>
-          ))}
-        </div>
-
-        {/* Insights */}
-        {insights.length > 0 && (
-          <div>
-            <h2 className="text-lg font-semibold text-gray-900">Detected Insights</h2>
-            <ul className="mt-2 space-y-2">
-              {insights.map(ins => (
-                <li key={ins.id} className="text-sm text-gray-700">
-                  • {ins.text} — <span className="text-gray-500">Confidence: {ins.confidence} ({ins.instanceCount} instances)</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
-
-        {/* Active Medications */}
-        <div>
-          <h2 className="text-lg font-semibold text-gray-900">Active Medications</h2>
-          <table className="w-full mt-2 text-sm">
-            <thead>
-              <tr className="border-b border-gray-200">
-                <th className="text-left py-1 text-gray-600">Medication</th>
-                <th className="text-left py-1 text-gray-600">Dosage</th>
-                <th className="text-left py-1 text-gray-600">Class</th>
-                <th className="text-left py-1 text-gray-600">Started</th>
-              </tr>
-            </thead>
-            <tbody>
-              {activeMeds.map(m => (
-                <tr key={m.id} className="border-b border-gray-100">
-                  <td className="py-1">{m.name}</td>
-                  <td className="py-1">{m.dosage}, {m.frequency}</td>
-                  <td className="py-1">{DRUG_CLASS_LABELS[m.drugClass]}</td>
-                  <td className="py-1">{format(parseISO(m.startDate), 'MMM d, yyyy')}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
-        {/* Recent Visits */}
-        <div>
-          <h2 className="text-lg font-semibold text-gray-900">Recent Visits</h2>
-          <div className="mt-2 space-y-2">
-            {recentVisits.map(v => (
-              <div key={v.id} className="text-sm text-gray-700">
-                <span className="font-medium">{format(parseISO(v.date), 'MMM d, yyyy')}</span> —{' '}
-                {getProviderName(v.providerId)}: {v.purpose}. {v.notes}
+      {/* Report Preview */}
+      <Card className="hover-lift shadow-xl shadow-foreground/5 transition-shadow hover:shadow-2xl">
+        <div ref={reportRef} className="bg-white text-gray-900 p-8 space-y-6">
+          {/* Header */}
+          <div className="border-b-2 border-blue-600 pb-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center">
+                <FileText className="h-5 w-5 text-white" />
               </div>
-            ))}
+              <div>
+                <h2 className="text-xl font-bold text-gray-900">CareWeave Health Report</h2>
+                <p className="text-sm text-gray-500">
+                  Generated {format(new Date(), 'MMMM d, yyyy')} • {doctorMode ? 'Clinical Format' : 'Patient Format'}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Patient Info */}
+          <div className="bg-blue-50 rounded-lg p-4">
+            <h3 className="font-bold text-gray-800 mb-2">Patient Information</h3>
+            <div className="grid grid-cols-2 text-sm gap-1">
+              <p><span className="text-gray-500">Name:</span> {patient.name}</p>
+              <p><span className="text-gray-500">Conditions:</span> {patient.conditions.join(', ')}</p>
+            </div>
+            <p className="text-sm font-medium text-blue-600 mt-2">
+              {changePct > 0 ? `Symptoms improved ${changePct}%` : changePct < 0 ? `Symptoms increased ${Math.abs(changePct)}%` : 'Symptoms stable'} over tracking period
+            </p>
+          </div>
+
+          {/* Health Story */}
+          <div>
+            <h3 className="font-bold text-gray-800 mb-2">{doctorMode ? 'Clinical Summary' : 'Health Journey'}</h3>
+            {story.map((p, i) => <p key={i} className="text-sm text-gray-700 mb-2 leading-relaxed">{p}</p>)}
+          </div>
+
+          {/* Insights */}
+          {insights.length > 0 && (
+            <div>
+              <h3 className="font-bold text-gray-800 mb-2">Detected Insights</h3>
+              <ul className="space-y-2">
+                {insights.map(ins => (
+                  <li key={ins.id} className="text-sm text-gray-700 flex items-start gap-2">
+                    <span className="text-blue-600 mt-1">•</span>
+                    <span>{ins.text} <span className="text-gray-400 text-xs">(Confidence: {ins.confidence}, {ins.instanceCount} instances)</span></span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {/* Active Medications */}
+          <div>
+            <h3 className="font-bold text-gray-800 mb-2">Active Medications</h3>
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-gray-200">
+                  <th className="text-left py-1 text-gray-600">Medication</th>
+                  <th className="text-left py-1 text-gray-600">Dosage</th>
+                  <th className="text-left py-1 text-gray-600">Class</th>
+                  <th className="text-left py-1 text-gray-600">Started</th>
+                </tr>
+              </thead>
+              <tbody>
+                {activeMeds.map(m => (
+                  <tr key={m.id} className="border-b border-gray-100">
+                    <td className="py-1">{m.name}</td>
+                    <td className="py-1">{m.dosage}, {m.frequency}</td>
+                    <td className="py-1">{DRUG_CLASS_LABELS[m.drugClass]}</td>
+                    <td className="py-1">{format(parseISO(m.startDate), 'MMM d, yyyy')}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Recent Visits */}
+          <div>
+            <h3 className="font-bold text-gray-800 mb-2">Recent Visits</h3>
+            <div className="space-y-2">
+              {recentVisits.map(v => (
+                <div key={v.id} className="text-sm text-gray-700">
+                  <span className="font-medium">{format(parseISO(v.date), 'MMM d, yyyy')}</span> — {getProviderName(v.providerId)}: {v.purpose}. {v.notes}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Disclaimer */}
+          <div className="border-t border-gray-200 pt-4">
+            <p className="text-xs italic text-gray-400">{HEALTH_STORY_DISCLAIMER}</p>
           </div>
         </div>
-
-        {/* Disclaimer */}
-        <p className="text-xs italic text-gray-400 pt-4 border-t border-gray-200">
-          {HEALTH_STORY_DISCLAIMER}
-        </p>
-      </div>
+      </Card>
     </div>
   );
 }
